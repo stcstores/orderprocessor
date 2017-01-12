@@ -1,6 +1,6 @@
-git+ssh://lseagle@lsgit.uk/~/lsgit.uk/pylinnworks.git@old_api
-git+ssh://lseagle@lsgit.uk/~/lsgit.uk/stclocal.git@v1.5
-git+ssh://lseagle@lsgit.uk/~/lsgit.uk/weights_db.git@v1.0
-git+ssh://lseagle@lsgit.uk/~/lsgit.uk/linnworks_db.git@v1.0
+git+https://github.com/stcstores/pylinnworks.git@old_api
+git+https://github.com/stcstores/stclocal.git@v1.5
+git+https://github.com/stcstores/weights_db.git@v1.0
+git+https://github.com/stcstores/linnworks_db.git@v1.0
 termcolor
 colorama
