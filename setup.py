@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='orderprocessor',
-    version='1.1',
+    version='1.2',
     description='Dispatches Linnworks orders',
     author='Luke Shiner',
     install_requires=['termcolor', 'colorama'],

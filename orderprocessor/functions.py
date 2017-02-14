@@ -1,4 +1,9 @@
+import os
+import datetime
+
 from termcolor import cprint
+from tabler import Tabler as Table
+import weights_db
 import pylinnworks
 
 from . exceptions import OrderNumberNotFound
@@ -45,3 +50,33 @@ def process_weight(weight_database, order, completed_items):
                 item.stock_id, item_weight)
             cprint('Added {}g to weights for {}'.format(
                 item_weight, item.title), 'cyan')
+
+
+class Audit:
+    def __init__(self):
+        day = datetime.datetime.now()
+        date_string = day.strftime('%Y-%m-%d')
+        self.filename = date_string + '_shipping_audit.csv'
+        self.audit_location = os.path.expanduser('~/Desktop')
+        self.audit_file_path = os.path.join(self.audit_location, self.filename)
+        if os.path.exists(self.audit_file_path):
+            self.table = Table(self.audit_file_path)
+        else:
+            self.table = Table(
+                header=['Order ID', 'Country', 'Weight', 'Errors'])
+        self.weight_database = weights_db.WeightsDB()
+
+    def audit_order(self, order):
+        errors = 0
+        weight = 0
+        for item in order.items:
+            try:
+                item_weight = self.weight_database.get_completed_weight(
+                    item.stock_id)
+            except ValueError:
+                errors += 1
+            else:
+                weight += item_weight
+        self.table.append(
+            [order.order_number, order.country, weight, errors])
+        self.table.write(self.audit_file_path)

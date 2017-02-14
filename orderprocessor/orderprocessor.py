@@ -12,10 +12,10 @@ from . exceptions import OrderGUIDNotFound
 from . exceptions import OrderDataNotFound
 from . exceptions import OrderAlreadyProcessed
 from . exceptions import LinnworksAPIUnavailable
-from . functions import get_order, process_weight
+from . functions import get_order, process_weight, Audit
 
 
-def process_orders(api_session, weights=False):
+def process_orders(api_session, weights=False, audit=False):
     colorama.init()
     if weights is True:
         cprint('Processing orders with weights', 'green')
@@ -23,7 +23,11 @@ def process_orders(api_session, weights=False):
         completed_items = WeightsDB().completed_db.get_stock_ids()
     else:
         cprint('Processing orders without weights', 'red')
-
+    if audit is True:
+        auditer = Audit()
+        cprint('Auditing orders', 'green')
+    else:
+        cprint('Not auditing orders', 'red')
     while True:
         order = None
         order_number = input('Order Number > ')
@@ -62,6 +66,8 @@ def process_orders(api_session, weights=False):
             cprint('Error: {} for {} may not be processed'.format(
                 order_number, customer_name), 'red', attrs=['bold'])
         else:
+            if audit is True:
+                auditer.audit_order(order)
             cprint('{} Processed for {}'.format(
                 order_number, customer_name), 'green', 'on_white')
 
@@ -70,10 +76,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", dest='weights', action='store_true')
     parser.add_argument("--no-weights", dest='weights', action='store_false')
-    parser.set_defaults(weights=True)
+    parser.add_argument("--audit", dest='audit', action='store_true')
+    parser.add_argument("--no-audit", dest='audit', action='store_false')
+    parser.set_defaults(weights=True, audit=False)
     args = parser.parse_args()
     try:
         api_session = pylinnworks.LinnworksAPISession()
     except:
         raise LinnworksAPIUnavailable(None)
-    process_orders(api_session, weights=args.weights)
+    process_orders(api_session, weights=args.weights, audit=args.audit)
